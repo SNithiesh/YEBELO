@@ -1,0 +1,27 @@
+FROM rust:latest
+
+# Set fast crates.io mirror to avoid network throttling
+RUN mkdir -p /root/.cargo && echo '\
+[source.crates-io]\n\
+replace-with = "ustc"\n\
+\n\
+[source.ustc]\n\
+registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"\n\
+\n\
+[net]\n\
+retry = 5\n\
+' > /root/.cargo/config.toml
+
+# Add WASM target
+RUN rustup target add wasm32-unknown-unknown
+
+WORKDIR /workspace
+
+# Copy project files
+COPY Cargo.toml build.rs ./
+COPY proto/ ./proto/
+COPY src/ ./src/
+
+# Build in release mode targeting WASM
+RUN cargo build --target wasm32-unknown-unknown --release
+

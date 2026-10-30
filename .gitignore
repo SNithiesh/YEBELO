@@ -1,0 +1,5 @@
+target/
+.env
+auth.json
+*.auth.token
+output/transfers_raw.jsonl
